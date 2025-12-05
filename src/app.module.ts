@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { SessionsModule } from './common/sessions/sessions.module';
+import { AuthModule } from './common/auth/auth.module';
 
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 
 import { HealthModule } from './mvc/health/health.module';
+
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -31,8 +35,11 @@ import { HealthModule } from './mvc/health/health.module';
         };
       },
     }),
-    HealthModule,
+    SessionsModule,
+    AuthModule,
+    HealthModule
   ],
+  controllers: [AppController]
 })
 
 export class AppModule {}
