@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HealthPOC</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            height: 94vh;
+            background: #fffded;
+        }
+
+        .card {
+            background: #fafafa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 400px;
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 12px 40px 0px;
+            margin: auto;
+        }
+
+        .card h1 small {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: .5rem;
+        }
+
+        .card img {
+            max-width: 8rem;
+            margin: auto;
+            display: flex;
+        }
+    </style>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+
+<body>
+
+    <div class="card">
+        <img src="https://res.cloudinary.com/dyf0aokyn/image/upload/v1764926770/poc_logo_ugnaf9.png"
+            alt="Health POC Logo" />
+        <h1><small>Welcome</small>
+            <%= user.name %>!
+        </h1>
+        <hr />
+        <p>Email: <%= user.email %>
+        </p>
+        <p>Patient ID: <%= user.emrId %>
+        </p>
+        <hr />
+
+    </div>
+
+</body>
+
+</html>

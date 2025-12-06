@@ -5,12 +5,16 @@ import { Response } from "express";
 @Controller()
 export class AppController {
   @Get("/")
-  index(@User() user, @Req() req, @Res({ passthrough: true }) res: Response) {
+  index(@User() user, @Req() req, @Res() res: Response) {
     if (!user) {
-      res.redirect("/login");
-      return;
+      return res.redirect("/login");
     }
 
-    return user?.profile?._json;
+    return res.render('index', {
+      user: user?.profile?._json,
+      links: [
+        { label: 'Logout', href: '/logout' },
+      ],
+    });
   }
 }
