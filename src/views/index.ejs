@@ -3,6 +3,7 @@
 
 <head>
     <title>HealthPOC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
         body {
             font-family: sans-serif;
@@ -25,6 +26,8 @@
 
             @media screen and (max-width: 600px) {
                 flex-direction: column;
+                max-width: 96%;
+                min-width: none;
             }
 
             hr {
@@ -45,7 +48,7 @@
                     small {
                         display: block;
                         font-size: 1rem;
-                        margin-bottom: .5rem;
+                        margin-bottom: .25rem;
                     }
                 }
 
@@ -54,8 +57,17 @@
 
                     img {
                         border-radius: 50%;
-                        max-width: 4rem;
+                        max-width: 3rem;
                     }
+                }
+            }
+
+            .attr {
+                small {
+                    display: block;
+                    font-weight: bold;
+                    color: #505a5a;
+                    margin-bottom: .25rem;
                 }
             }
 
@@ -66,6 +78,8 @@
             }
 
             .col {
+                align-content: center;
+
                 &:first-child {
                     flex: 1;
                     margin-right: 2rem;
@@ -78,7 +92,38 @@
                         padding-right: 0;
                         margin-bottom: 2rem;
                         border-bottom: solid 1px #d3d3d3;
-                        padding-bottom: 2rem;
+                        padding-bottom: 1rem;
+                    }
+                }
+                .fallback {
+                    position: relative;                    
+                    &::after {
+                        content: '\2713';
+                        color: #fff;
+                        font-size: 3rem;
+                        margin-left: 0.35rem;
+                        position: absolute;
+                        left: 42%;
+                        top: -5.5rem;
+                        opacity: .17;
+                        background: #505a5a;
+                        border-radius: 300%;
+                        aattrt-ratio: 1/1;
+                        height: 4.5rem;
+                        width: 4.5rem;
+                        text-align: center;
+                        display: flex;
+                        align-content: center;
+                        justify-content: center;
+                        align-items: center;
+                        @media screen and (max-width: 600px) {
+                           display: none;
+                        }
+                    }
+                }
+                &:has(.fallback) {
+                    @media screen and (min-width: 601px) {
+                        padding-top: 2rem;
                     }
                 }
             }
@@ -104,16 +149,15 @@
                 </h1>
             </div>
             <hr />
-            <p>Email: <%= user.email %>
+            <p class="attr"><small>Email:</small> <%= user.email %>
             </p>
-            <p>Patient ID: <%= user.emrId %>
+            <p class="attr"><small>Patient ID:</small> <%= user.emrId %>
             </p>
         </div>
         <div class="col">
-            You have no outstanding learning modules, tasks or forms.
+            <div class="fallback">You have no outstanding learning modules, tasks or forms.</div>
         </div>
     </div>
-
 </body>
 
 </html>

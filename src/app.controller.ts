@@ -2,7 +2,9 @@ import { Controller, Get, Res, Req } from "@nestjs/common";
 import { User as AuthUser } from "./common/auth/user.decorator";
 import { Response } from "express";
 import { DataSource } from "typeorm";
-import { User } from "./common/entities/user.entity";
+import { User as UserEntity } from "./common/entities/user.entity";
+import { User } from "./common/types";
+import { EngagedMDIntegration } from "./integrations/engagedmd/EngagedMDIntegration";
 
 @Controller()
 export class AppController {
@@ -14,22 +16,36 @@ export class AppController {
       return res.redirect("/login");
     }
 
-    const profile = user?.profile?._json ?? {};
-    const dbUser = await this.dataSource.getRepository(User).findOne({
-      where: { remId: profile.sub },
+    const authProviderUser = user?.profile?._json ?? {};
+    const dbUser = await this.dataSource.getRepository(UserEntity).findOne({
+      where: { remId: authProviderUser.sub },
       relations: ["role"],
     });
 
-    const roleFromDb = dbUser?.role;
-    const role =
-      roleFromDb ??
-      profile.role;
+    if(!dbUser) {
+      return res.send("User not found.");
+    }
 
     const mergedUser = {
-      ...profile,
-      emrId: dbUser?.emrId ?? profile.emrId,
-      role,
-    };
+      ...authProviderUser,
+      emrId: dbUser?.emrId,
+      role: dbUser?.role
+    } as User;
+
+    const engagedMD = new EngagedMDIntegration({
+      config: {
+        practiceId: process.env["ENGAGEDMD_PRACTICE"]!,
+        apiBaseUrl: process.env["ENGAGEDMD_API_BASE_URL"]!,
+        authRedirectUrl: process.env["ENGAGEDMD_AUTH_CALLBACK_URL"]!,
+        apiUsername: process.env["ENGAGEDMD_USERNAME"]!,
+        apiPassword: process.env["ENGAGEDMD_PASSWORD"]!,
+      }
+    });
+
+    // await engagedMD.runCommand("auth", "init", mergedUser);
+    // const redirectUri = await engagedMD.runCommand("auth", "getRedirectUrl", mergedUser);
+
+    // console.log("EngagedMD SSO Redirect URI:", redirectUri);
 
     return res.render("index", {
       user: mergedUser,
