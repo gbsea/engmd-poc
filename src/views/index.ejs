@@ -17,21 +17,71 @@
             background: #fafafa;
             padding: 1.5rem;
             border-radius: 8px;
-            max-width: 400px;
+            max-width: 800px;
+            min-width: 340px;
             box-shadow: rgba(0, 0, 0, 0.12) 0px 12px 40px 0px;
             margin: auto;
-        }
-
-        .card h1 small {
-            display: block;
-            font-size: 1rem;
-            margin-bottom: .5rem;
-        }
-
-        .card img {
-            max-width: 8rem;
-            margin: auto;
             display: flex;
+
+            @media screen and (max-width: 600px) {
+                flex-direction: column;
+            }
+
+            hr {
+                border: none;
+                border-top: 1px solid #d3d3d3;
+                margin: 1.5rem 0;
+            }
+
+            .header {
+                display: flex;
+                margin: 2rem 0 1rem 0;
+                align-items: center;
+
+                h1 {
+                    font-size: 1.5rem;
+                    margin: 0;
+
+                    small {
+                        display: block;
+                        font-size: 1rem;
+                        margin-bottom: .5rem;
+                    }
+                }
+
+                .avatar {
+                    margin-right: 1rem;
+
+                    img {
+                        border-radius: 50%;
+                        max-width: 4rem;
+                    }
+                }
+            }
+
+            .logo {
+                max-width: 9rem;
+                margin: auto;
+                display: flex;
+            }
+
+            .col {
+                &:first-child {
+                    flex: 1;
+                    margin-right: 2rem;
+                    border-right: solid 1px #d3d3d3;
+                    padding-right: 2rem;
+
+                    @media screen and (max-width: 600px) {
+                        margin-right: 0;
+                        border-right: none;
+                        padding-right: 0;
+                        margin-bottom: 2rem;
+                        border-bottom: solid 1px #d3d3d3;
+                        padding-bottom: 2rem;
+                    }
+                }
+            }
         }
     </style>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -40,18 +90,28 @@
 <body>
 
     <div class="card">
-        <img src="https://res.cloudinary.com/dyf0aokyn/image/upload/v1764926770/poc_logo_ugnaf9.png"
-            alt="Health POC Logo" />
-        <h1><small>Welcome</small>
-            <%= user.name %>!
-        </h1>
-        <hr />
-        <p>Email: <%= user.email %>
-        </p>
-        <p>Patient ID: <%= user.emrId %>
-        </p>
-        <hr />
-
+        <div class="col">
+            <img class="logo"
+                src="https://res.cloudinary.com/dyf0aokyn/image/upload/v1764984414/health_poc_logo_itsiea.png"
+                alt="Health POC Logo" />
+            <div class="header">
+                <div class="avatar">
+                    <img src="<%= user.picture %>" alt="<%= user.name %> Avatar" />
+                </div>
+                <h1>
+                    <small>Welcome</small>
+                    <%= user.name %>!
+                </h1>
+            </div>
+            <hr />
+            <p>Email: <%= user.email %>
+            </p>
+            <p>Patient ID: <%= user.emrId %>
+            </p>
+        </div>
+        <div class="col">
+            You have no outstanding learning modules, tasks or forms.
+        </div>
     </div>
 
 </body>
