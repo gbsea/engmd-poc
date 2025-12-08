@@ -5,12 +5,12 @@
     <title>HealthPOC</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/css/index.css">
+    <script src="https://kit.fontawesome.com/9b0e07760b.js" crossorigin="anonymous"></script>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 
 <body>
-
-    <div class="card">
+    <div class="card main">
         <div class="col">
             <img class="logo"
                 src="https://res.cloudinary.com/dyf0aokyn/image/upload/v1764984414/health_poc_logo_itsiea.png"
@@ -34,6 +34,28 @@
             <div class="fallback">You have no outstanding learning modules, tasks or forms.</div>
         </div>
     </div>
+    <% if (integrations && integrations.length) { %>
+    <div class="card integrations">
+        <h3>Integrated Partners</h3>
+        <hr />
+        <div class="integration-list">
+            <% integrations.forEach(function(integration) { %>
+                <div class="integration">
+                    <% if (integration.iconUrl) { %>
+                        <img class="integration-icon" src="<%= integration.iconUrl %>" alt="<%= integration.name %> icon" />
+                    <% } %>
+                    <div class="integration-meta">
+                        <div class="integration-name"><%= integration.name %></div>
+                        <p class="integration-description"><%= integration.description %></p>
+                        <% if (integration.launchUrl) { %>
+                            <a class="integration-link" target="_blank" href="<%= integration.launchUrl %>">Launch <%= integration.name %> <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+    <% } %>
 </body>
 
 </html>

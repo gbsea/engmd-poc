@@ -13,6 +13,6 @@ export class IndexController {
       return res.redirect("/login");
     }
 
-    return res.render("index", this.indexService.getIndexView(user));
+    return res.render("index", await this.indexService.getIndexView(user));
   }
 }
