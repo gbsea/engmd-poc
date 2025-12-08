@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   HttpException,
+  Param,
+  Query,
   Res,
   UseGuards,
 } from "@nestjs/common";
@@ -16,9 +18,13 @@ export class EngagedMdController {
   constructor(private readonly engagedMd: EngagedMdService) {}
 
   @Get("init")
-  async init(@AuthUser() user, @Res() res: Response) {
+  async init(
+    @AuthUser() user,
+    @Query("assignmentId") assignmentId: string | undefined,
+    @Res() res: Response
+  ) {
     try {
-      const redirectUri = await this.engagedMd.init(user);
+      const redirectUri = await this.engagedMd.init(user, assignmentId);
       return res.redirect(redirectUri);
     } catch (error) {
       if (error instanceof HttpException) {

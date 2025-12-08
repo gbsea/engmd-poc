@@ -7,6 +7,7 @@ import { User as UserEntity } from "../../../common/entities/user.entity";
 import { Integration as IntegrationEntity } from "../../../common/entities/integration.entity";
 import { UserIntegration as UserIntegrationEntity } from "../../../common/entities/user-integration.entity";
 import { AppLogger } from "../../../common/logging/app-logger.service";
+import { User } from "../../../common/types";
 
 @Injectable()
 export class EngagedMdService {
@@ -30,7 +31,8 @@ export class EngagedMdService {
         ...engagedMdConfig
       },
       state: {
-        userSSOHash: null
+        userSSOHash: null,
+        assignmentId: null,
       },
       repos: {
         user: this.users,
@@ -41,14 +43,14 @@ export class EngagedMdService {
     });
   }
 
-  async init(user: any): Promise<string> {
+  async init(user: User, assignmentId?: string): Promise<string> {
     const userHasIntegration = await this.engagedMDIntegration.ensureUserHasIntegration(user);
 
     if(!userHasIntegration) {
       throw new Error("User is not enrolled with EngagedMD integration.");
     }
 
-    await this.engagedMDIntegration.runCommand("auth", "init", user);
+    await this.engagedMDIntegration.runCommand("auth", "init", { user, assignmentId });
     return this.engagedMDIntegration.runCommand("auth", "getRedirectUrl", user);
   }
 }

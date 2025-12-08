@@ -17,7 +17,8 @@ export interface EngagedMDContext extends IntegrationContext {
     codebaseKey: string;
   };
   state?: {
-    userSSOHash?: string;
+    userSSOHash?: string | null;
+    assignmentId?: string | null;
   };
 }
 
@@ -40,7 +41,6 @@ export class EngagedMDIntegration extends BaseIntegration {
     // CONTENT
     this.registerCommand("content", "getAssignedContent", this.getAssignedContentCommand);
   }
-
   // USER COMMAND HANDLERS
   private enrollUserCommand = async (client, user: User) => {
     try {
@@ -69,8 +69,14 @@ export class EngagedMDIntegration extends BaseIntegration {
   };
 
   // USER AUTH COMMAND HANDLERS
-  private authInitCommand = async (client, user: User) => {
+  private authInitCommand = async (...args) => {
+    const [ client, { user, assignmentId } ] = args;
+
     this.context.state.userSSOHash = v4();
+
+    if(assignmentId) {
+      this.context.state.assignmentId = assignmentId;
+    }
 
     try {
       const response = await client("/sso", {
@@ -97,11 +103,20 @@ export class EngagedMDIntegration extends BaseIntegration {
       throw new Error("SSO hash not found in state.");
     }
 
-    const redirectUrl = this.context.config.authRedirectUrl
+    let redirectUrl = this.context.config.authRedirectUrl
       .replace("%practice%", this.context.config.practiceId)
       .replace("%token%", this.context.state.userSSOHash || "");
 
-    this.context.state.userSSOHash = null;
+    if(this.context.state.assignmentId) {
+      redirectUrl += `&assignmentId=${this.context.state.assignmentId}`;
+    }
+
+    this.context.state = {
+      userSSOHash: null,
+      assignmentId: null,
+    };
+
+    this.logger.log(`Generated redirect URL: ${redirectUrl}`);
 
     return redirectUrl;
   };
