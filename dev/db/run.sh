@@ -3,7 +3,9 @@
 CONF=${PWD}/.env
 
 if [ -f "$CONF" ]; then
-    source "$CONF" else
+    set -a
+    source "$CONF"
+    set +a
 else
     echo "Error: $CONF not found. Please run 'npm run decrypt-env -- %passphrase%' to create it / decrypt it."
     exit 1
