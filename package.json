@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "Greg Brooks <gb_sea@icloud.com>",
   "license": "UNLICENSED",
-  "description": "POC system that integrations with EngagedMD external API",
+  "description": "POC Heath system that integrates with external APIs",
   "dependencies": {
     "@nestjs/config": "^4.0.2",
     "@nestjs/passport": "^11.0.5",

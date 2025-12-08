@@ -1,5 +1,5 @@
 # Health POC
-POC system that integrations with EngagedMD external API
+POC Heath system that integrates with external APIs
 
 ## Design & Considerations
 See the SYSTEM.md [SYSTEM.md](SYSTEM.md) file for system design details and considerations
