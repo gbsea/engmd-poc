@@ -3,35 +3,19 @@ import { NestExpressApplication } from "@nestjs/platform-express";
 import { AppModule } from "./app.module";
 import { join } from 'path';
 import * as express from 'express';
-import { AppLogger } from "./common/logging/app-logger.service";
 import { ConfigService } from "@nestjs/config";
+import { findMvcViewDirectories } from "./common/utils/find-mvc-view-directories";
+import { setupLogger } from "./common/logging/setup-logger";
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
 
-  const logger = app.get(AppLogger);
-  app.useLogger(logger);
-
-  console.log = (...args: any[]) => logger.log(args.map(String).join(" "));
-  console.warn = (...args: any[]) => logger.warn(args.map(String).join(" "));
-  console.error = (...args: any[]) => logger.error(args.map(String).join(" "));
-
-  app.use((req, res, next) => {
-    const start = Date.now();
-    res.on("finish", () => {
-      const duration = Date.now() - start;
-      logger.log(
-        `${req.method} ${req.originalUrl} -> ${res.statusCode} (${duration}ms)`,
-        "Access",
-      );
-    });
-    next();
-  });
+  const logger = setupLogger(app);
 
   app.setViewEngine('ejs');
-  app.setBaseViewsDir(join(__dirname, '..', 'src/views'));
+  app.setBaseViewsDir(findMvcViewDirectories(join(__dirname, '..', 'src', 'mvc')));
   app.use('/', express.static(join(__dirname, '..', 'public')));
 
   const configService = app.get(ConfigService);

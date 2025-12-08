@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict xQQXNk6O6iOdTfpVaXnrhZ9i8InL7ZRf1gY9b4ZUGOtQgRuUVEeEdHiomJhAPrA
+\restrict PhCcZNXLNf85DZJrP7kRqcPyxdvHT7nNMb3B0YSaQeNqh9Jh4F4L9CE8TmfvRWa
 
 -- Dumped from database version 16.11 (Debian 16.11-1.pgdg13+1)
 -- Dumped by pg_dump version 16.11 (Debian 16.11-1.pgdg13+1)
@@ -27,9 +27,9 @@ CREATE DATABASE sessions WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROV
 
 ALTER DATABASE sessions OWNER TO localdev;
 
-\unrestrict xQQXNk6O6iOdTfpVaXnrhZ9i8InL7ZRf1gY9b4ZUGOtQgRuUVEeEdHiomJhAPrA
+\unrestrict PhCcZNXLNf85DZJrP7kRqcPyxdvHT7nNMb3B0YSaQeNqh9Jh4F4L9CE8TmfvRWa
 \connect sessions
-\restrict xQQXNk6O6iOdTfpVaXnrhZ9i8InL7ZRf1gY9b4ZUGOtQgRuUVEeEdHiomJhAPrA
+\restrict PhCcZNXLNf85DZJrP7kRqcPyxdvHT7nNMb3B0YSaQeNqh9Jh4F4L9CE8TmfvRWa
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -78,5 +78,5 @@ CREATE INDEX "IDX_session_expire" ON public.session USING btree (expire);
 -- PostgreSQL database dump complete
 --
 
-\unrestrict xQQXNk6O6iOdTfpVaXnrhZ9i8InL7ZRf1gY9b4ZUGOtQgRuUVEeEdHiomJhAPrA
+\unrestrict PhCcZNXLNf85DZJrP7kRqcPyxdvHT7nNMb3B0YSaQeNqh9Jh4F4L9CE8TmfvRWa
 
