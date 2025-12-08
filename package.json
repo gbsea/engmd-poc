@@ -1,11 +1,11 @@
 {
-  "name": "engagedmd-api-poc",
+  "name": "health-poc",
   "version": "0.0.1",
   "main": "src/main.ts",
   "scripts": {
     "start-dev-db": "./dev/db/run.sh",
     "start-http": "PORT=43000 ts-node-dev --respawn --transpile-only src/main.ts",
-    "start": "concurrently --kill-others \"npm run start-dev-db\" \"npm run start-http\"",
+    "start": "concurrently --kill-others --names \"DB,Node\" --prefix-colors \"blue,cyan\" \"npm run start-dev-db\" \"npm run start-http\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "encrypt-env": "node -e \"const fs=require('fs'),crypto=require('crypto'); const pass=process.argv[1]; if(!pass){console.error('Usage: npm run encrypt-env -- <passphrase>');process.exit(1);} const plaintext=fs.readFileSync('.env'); const salt=crypto.randomBytes(16); const key=crypto.scryptSync(pass,salt,32); const iv=crypto.randomBytes(12); const cipher=crypto.createCipheriv('aes-256-gcm',key,iv); const enc=Buffer.concat([cipher.update(plaintext),cipher.final()]); const tag=cipher.getAuthTag(); const out=Buffer.concat([salt,iv,tag,enc]).toString('base64'); fs.writeFileSync('.env.encrypted',out);\"",
     "decrypt-env": "node -e \"const fs=require('fs'),crypto=require('crypto'); const pass=process.argv[1]; if(!pass){console.error('Usage: npm run decrypt-env -- <passphrase>');process.exit(1);} const b=Buffer.from(fs.readFileSync('.env.encrypted','utf8'),'base64'); const salt=b.subarray(0,16),iv=b.subarray(16,28),tag=b.subarray(28,44),data=b.subarray(44); const key=crypto.scryptSync(pass,salt,32); const decipher=crypto.createDecipheriv('aes-256-gcm',key,iv); decipher.setAuthTag(tag); const dec=Buffer.concat([decipher.update(data),decipher.final()]); fs.writeFileSync('.env',dec);\""

@@ -1,10 +1,12 @@
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { EngagedMDIntegration } from "../../../integrations/engagedmd/EngagedMDIntegration";
 import { User as UserEntity } from "../../../common/entities/user.entity";
 import { Integration as IntegrationEntity } from "../../../common/entities/integration.entity";
 import { UserIntegration as UserIntegrationEntity } from "../../../common/entities/user-integration.entity";
+import { AppLogger } from "../../../common/logging/app-logger.service";
 
 @Injectable()
 export class EngagedMdService {
@@ -17,15 +19,15 @@ export class EngagedMdService {
     private readonly integrations: Repository<IntegrationEntity>,
     @InjectRepository(UserIntegrationEntity)
     private readonly userIntegrations: Repository<UserIntegrationEntity>,
+    private readonly configService: ConfigService,
+    private readonly logger: AppLogger,
   ) {
+    const engagedMdConfig = this.configService.get("integrations.engagedmd")!;
+
     this.engagedMDIntegration = new EngagedMDIntegration({
       config: {
         codebaseKey: "engagedMD",
-        practiceId: process.env["ENGAGEDMD_PRACTICE"]!,
-        apiBaseUrl: process.env["ENGAGEDMD_API_BASE_URL"]!,
-        authRedirectUrl: process.env["ENGAGEDMD_AUTH_CALLBACK_URL"]!,
-        apiUsername: process.env["ENGAGEDMD_USERNAME"]!,
-        apiPassword: process.env["ENGAGEDMD_PASSWORD"]!,
+        ...engagedMdConfig
       },
       state: {
         userSSOHash: null
@@ -35,6 +37,7 @@ export class EngagedMdService {
         integration: this.integrations,
         userIntegration: this.userIntegrations,
       },
+      logger: this.logger,
     });
   }
 

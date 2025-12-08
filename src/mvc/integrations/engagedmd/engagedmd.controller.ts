@@ -1,4 +1,10 @@
-import { Controller, Get, Res, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  HttpException,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { Response } from "express";
 import { AuthenticatedGuard } from "../../../common/auth/authenticated.guard";
 import { User as AuthUser } from "../../../common/auth/user.decorator";
@@ -11,7 +17,22 @@ export class EngagedMdController {
 
   @Get("init")
   async init(@AuthUser() user, @Res() res: Response) {
-    const redirectUri = await this.engagedMd.init(user);
-    return res.redirect(redirectUri);
+    try {
+      const redirectUri = await this.engagedMd.init(user);
+      return res.redirect(redirectUri);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        const status = error.getStatus();
+        const response = error.getResponse();
+        const payload =
+          typeof response === "string" ? { message: response } : response;
+
+        return res.status(status).json(payload);
+      }
+
+      return res
+        .status(500)
+        .json({ message: "Failed to initialize EngagedMD integration" });
+    }
   }
 }

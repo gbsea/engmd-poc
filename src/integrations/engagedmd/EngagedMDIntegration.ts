@@ -4,6 +4,7 @@ import {
   IntegrationContext,
   IntegrationRepositories,
 } from "../BaseIntegration";
+import { LoggerService } from "@nestjs/common";
 import { v4 } from "uuid";
 
 export interface EngagedMDContext extends IntegrationContext {
@@ -22,11 +23,12 @@ export interface EngagedMDContext extends IntegrationContext {
 
 export interface EngagedMDInitArgs extends EngagedMDContext {
   repos: IntegrationRepositories;
+  logger: LoggerService;
 }
 
 export class EngagedMDIntegration extends BaseIntegration {
-  constructor({ config, state, repos }: EngagedMDInitArgs) {
-    super({ config, state }, repos);
+  constructor({ config, state, repos, logger }: EngagedMDInitArgs) {
+    super({ config, state }, repos, logger);
 
     // USER MANAGEMENT
     this.registerCommand("user", "enroll", this.enrollUserCommand);
@@ -60,7 +62,8 @@ export class EngagedMDIntegration extends BaseIntegration {
 
       await this.addUserToIntegration(user);
     } catch (error) {
-      console.error("Error enrolling user:", error);
+      const err = error as Error;
+      this.logger.error(`Error enrolling user: ${err.message}`, err?.stack);
       throw error;
     }
   };
@@ -83,7 +86,8 @@ export class EngagedMDIntegration extends BaseIntegration {
         throw new Error(`Failed to initiate auth: ${response.statusText}`);
       }
     } catch (error) {
-      console.error("Error initiating auth:", error);
+      const err = error as Error;
+      this.logger.error(`Error initiating auth: ${err.message}`, err?.stack);
       throw error;
     }
   };
@@ -96,6 +100,8 @@ export class EngagedMDIntegration extends BaseIntegration {
     const redirectUrl = this.context.config.authRedirectUrl
       .replace("%practice%", this.context.config.practiceId)
       .replace("%token%", this.context.state.userSSOHash || "");
+
+    this.context.state.userSSOHash = null;
 
     return redirectUrl;
   };
@@ -114,7 +120,8 @@ export class EngagedMDIntegration extends BaseIntegration {
       const content = await response.json();
       return content;
     } catch (error) {
-      console.error("Error fetching assigned content:", error);
+      const err = error as Error;
+      this.logger.error(`Error fetching assigned content: ${err.message}`, err?.stack);
       throw error;
     }
   };

@@ -3,6 +3,8 @@ import {
   ForbiddenException,
   NotFoundException,
   UnauthorizedException,
+  Logger,
+  LoggerService,
 } from "@nestjs/common";
 import { User } from "../common/types";
 import { User as UserEntity } from "../common/entities/user.entity";
@@ -44,9 +46,16 @@ export class BaseIntegration {
 
   private repos: IntegrationRepositories;
 
-  constructor(context: IntegrationContext, repos: IntegrationRepositories) {
+  protected logger: LoggerService;
+
+  constructor(
+    context: IntegrationContext,
+    repos: IntegrationRepositories,
+    logger: LoggerService = new Logger("Integration"),
+  ) {
     this.context = context;
     this.repos = repos;
+    this.logger = logger;
   }
 
   protected buildClient(): ApiClient {
@@ -197,6 +206,10 @@ export class BaseIntegration {
       const client = this.getClient();
       return await handler(client, input);
     } catch (err: any) {
+      this.logger.error(
+        `[${this.constructor.name}] ${group}.${name} failed: ${err.message}`,
+        err?.stack,
+      );
       throw new Error(
         `[${this.constructor.name}] ${group}.${name} failed: ${err.message}`
       );
