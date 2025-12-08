@@ -5,11 +5,14 @@ import { SessionsModule } from './common/sessions/sessions.module';
 import { AuthModule } from './common/auth/auth.module';
 import { Role } from './common/entities/role.entity';
 import { User } from './common/entities/user.entity';
+import { Integration } from './common/entities/integration.entity';
+import { UserIntegration } from './common/entities/user-integration.entity';
 
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 
 import { HealthModule } from './mvc/health/health.module';
+import { IntegrationModule } from './mvc/integrations/integrations.module';
 
 import { AppController } from './app.controller';
 
@@ -32,7 +35,7 @@ import { AppController } from './app.controller';
           username: db.username,
           password: db.password,
           database: db.name,
-          entities: [User, Role],
+          entities: [User, Role, Integration, UserIntegration],
           autoLoadEntities: true,
           synchronize: true,
         };
@@ -40,7 +43,8 @@ import { AppController } from './app.controller';
     }),
     SessionsModule,
     AuthModule,
-    HealthModule
+    HealthModule,
+    IntegrationModule
   ],
   controllers: [AppController]
 })

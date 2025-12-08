@@ -1,8 +1,20 @@
+import { Repository } from "typeorm";
+import {
+  ForbiddenException,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
+import { User } from "../common/types";
+import { User as UserEntity } from "../common/entities/user.entity";
+import { Integration as IntegrationEntity } from "../common/entities/integration.entity";
+import { UserIntegration as UserIntegrationEntity } from "../common/entities/user-integration.entity";
+
 export interface IntegrationConfig {
   apiBaseUrl: string;
 
   apiUsername?: string;
   apiPassword?: string;
+  codebaseKey: string;
 
   [key: string]: any;
 }
@@ -10,6 +22,12 @@ export interface IntegrationConfig {
 export interface IntegrationContext {
   config: IntegrationConfig;
   state?: Record<string, any>;
+}
+
+export interface IntegrationRepositories {
+  user: Repository<UserEntity>;
+  integration: Repository<IntegrationEntity>;
+  userIntegration: Repository<UserIntegrationEntity>;
 }
 
 export type CommandHandler<TInput, TOutput> = (
@@ -24,8 +42,11 @@ export class BaseIntegration {
 
   private commands = new Map<string, Map<string, CommandHandler<any, any>>>();
 
-  constructor(context: IntegrationContext) {
+  private repos: IntegrationRepositories;
+
+  constructor(context: IntegrationContext, repos: IntegrationRepositories) {
     this.context = context;
+    this.repos = repos;
   }
 
   protected buildClient(): ApiClient {
@@ -71,6 +92,77 @@ export class BaseIntegration {
 
   protected getClient() {
     return this.buildClient();
+  }
+
+  public async ensureUserHasIntegration(user: any): Promise<Boolean> {
+    if (!user) {
+      throw new UnauthorizedException("User not authenticated");
+    }
+
+    const dbUser = await this.repos.user.findOne({
+      where: { remId: user.sub },
+      relations: ["role"],
+    });
+
+    if (!dbUser) {
+      throw new UnauthorizedException("User not found");
+    }
+
+    const codebaseKey = this.context?.config?.codebaseKey;
+
+    if (!codebaseKey) {
+      throw new NotFoundException("Integration key not configured");
+    }
+
+    const integration = await this.repos.integration.findOne({
+      where: { codebaseKey: codebaseKey },
+    });
+
+    if (!integration) {
+      throw new NotFoundException("Integration not configured");
+    }
+
+    const userIntegration = await this.repos.userIntegration.findOne({
+      where: {
+        user: { id: dbUser.id },
+        integration: { id: integration.id },
+      },
+    });
+
+    if (!userIntegration) {
+      throw new ForbiddenException("User does not have the integration");
+    }
+
+    return true;
+  }
+
+  protected async addUserToIntegration(user: User) {
+    const integration = await this.repos.integration.findOne({
+      where: { codebaseKey: this.context.config.codebaseKey },
+    });
+
+    if (!integration) {
+      throw new Error("Integration not found in database");
+    }
+
+    const dbUser = await this.repos.user.findOne({
+      where: { remId: user.sub },
+    });
+
+    if (!dbUser) {
+      throw new Error("User not found in database");
+    }
+
+    const existingUserIntegration = await this.repos.userIntegration.findOne({
+      where: {
+        user: { id: dbUser.id },
+        integration: { id: integration.id },
+      },
+    });
+
+    if (!existingUserIntegration) {
+      await this.repos.userIntegration.save({ user: dbUser, integration });
+    }
   }
 
   protected registerCommand<TI, TO>(
